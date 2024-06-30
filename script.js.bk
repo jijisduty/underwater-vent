@@ -1,0 +1,233 @@
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { SphereGeometry } from "https://unpkg.com/three@0.157.0/build/three.module.js";
+import { FBXLoader } from "three/addons/loaders/FBXLoader";
+import { Reflector } from "three/addons/objects/Reflector.js";
+import { Refractor } from "three/addons/objects/Refractor.js";
+import GUI from "https://cdn.jsdelivr.net/npm/lil-gui@0.19/+esm";
+
+/**
+ * Debug
+ */
+const gui = new GUI();
+
+const scene = new THREE.Scene();
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+/**
+ * Shaders
+ */
+
+// Vertex Shader
+const vertexShader = `
+uniform mat4 textureMatrix;
+		varying vec4 vUv;
+
+		#include <common>
+		#include <logdepthbuf_pars_vertex>
+
+		void main() {
+
+			vUv = textureMatrix * vec4( position, 1.0 );
+
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+			#include <logdepthbuf_vertex>
+
+		}
+`;
+
+// Fragment Shader
+const fragmentShader = `
+  
+
+   uniform vec3 color;
+   uniform sampler2D tDiffuse;
+   varying vec4 vUv;
+   uniform sampler2D tDudv;
+   uniform float time;
+   uniform float waveStrength;
+   uniform float waveSpeed;
+
+   #include <logdepthbuf_pars_fragment>
+
+   void main() {
+
+       #include <logdepthbuf_fragment>
+
+       float waveStrength = 5.09;
+       float waveSpeed = 4.02;
+  
+        vec2 distortedUv = texture2D( tDudv, vec2( vUv.x + time * waveSpeed, vUv.y ) ).rg * waveStrength;
+        distortedUv = vUv.xy + vec2( distortedUv.x, distortedUv.y + time * waveSpeed );
+        vec2 distortion = ( texture2D( tDudv, distortedUv ).rg * 2.0 - 1.0 ) * waveStrength;
+  
+        // new uv coords
+  
+        vec4 uv = vec4( vUv );
+        uv.xy += distortion;
+
+       vec4 base = texture2DProj( tDiffuse, uv );
+       gl_FragColor = vec4( mix( base.rgb, color, 0.9 ), 1.0 );
+
+       #include <tonemapping_fragment>
+       #include <colorspace_fragment>
+
+   }
+`;
+
+// Vertex Shader
+const vertexShaderGrad = `
+void main() {
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}
+`;
+// Fragment Shader
+const fragmentShaderGrad = `
+uniform vec2 u_resolution;
+void main() {
+  vec2 uv = gl_FragCoord.xy / vec2(${window.innerWidth}, ${window.innerHeight});
+  vec3 col = 0.42 + 1.19 * cos(uv.y + vec3(0.5, 0.6, 0.552));
+  gl_FragColor = vec4(col, 1.0);
+}
+
+`;
+
+const camera = new THREE.PerspectiveCamera(
+  15,
+  window.innerWidth / window.innerHeight,
+  1,
+  10000
+);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+
+//controls.update() must be called after any manual changes to the camera's transform
+camera.position.set(0, 20, 100);
+
+// gui.add(camera.rotation, "x", -100, 100, 0.01);
+// gui.add(camera.rotation, "y", -100, 100, 0.01);
+// gui.add(camera.rotation, "z", -100, 100, 0.01);
+//camera.rotateY(-50 * THREE.MathUtils.degToRad);
+controls.update();
+//scene.background = new THREE.Color(0xfceee1);
+
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+scene.add(ambientLight);
+const pointLight = new THREE.PointLight(0xffffff, 1);
+camera.add(pointLight);
+scene.add(camera);
+
+// controls.enableDamping = true;
+//   // Objects
+
+/**
+ * Sky for reflection
+ */
+
+const planeGeometrySky = new THREE.PlaneGeometry(100, 100);
+const planeMaterialSky = new THREE.ShaderMaterial({
+  vertexShader: vertexShaderGrad,
+  fragmentShader: fragmentShaderGrad,
+});
+const planeSky = new THREE.Mesh(planeGeometrySky, planeMaterialSky);
+
+//planeSky.rotation.x = -Math.PI * 0.5;
+planeSky.position.y = 50;
+planeSky.position.z = -250;
+planeSky.rotation.y = 0;
+scene.add(planeSky);
+
+/**
+ * Texture
+ */
+
+const mirrorShader = Reflector.ReflectorShader;
+
+mirrorShader.vertexShader = vertexShader;
+mirrorShader.fragmentShader = fragmentShader;
+console.log(mirrorShader.vertexShader);
+
+const dudvMap = new THREE.TextureLoader().load(
+  "src/waterdudv.jpg",
+  function () {
+    animate();
+  }
+);
+console.log("dd ", dudvMap);
+
+mirrorShader.uniforms.tDudv = { value: dudvMap };
+mirrorShader.uniforms.time = { value: 0 };
+
+console.log(mirrorShader.uniforms.tDudv.value);
+console.log(mirrorShader.uniforms.time.value);
+
+dudvMap.wrapS = dudvMap.wrapT = THREE.RepeatWrapping;
+
+let geometry, groundMirror, material, mirrorOptions;
+
+const planeGeometry2 = new THREE.PlaneGeometry(250, 250);
+mirrorOptions = {
+  shader: mirrorShader,
+  clipBias: 0.003,
+  textureWidth: window.innerWidth,
+  textureHeight: window.innerHeight,
+  color: 0x495992,
+  //textureWidth: window.innerWidth * window.devicePixelRatio,
+  //textureHeight: window.innerHeight * window.devicePixelRatio,
+};
+
+groundMirror = new Reflector(planeGeometry2, mirrorOptions);
+groundMirror.position.y = 42;
+groundMirror.position.z = -220;
+//groundMirror.rotation.x = 10;
+groundMirror.rotation.x = -Math.PI * 1.5;
+gui.add(groundMirror.position, "x", -100, 100, 0.01);
+gui.add(groundMirror.position, "y", -100, 100, 0.01);
+gui.add(groundMirror.position, "z", -100, 100, 0.01);
+
+gui.add(groundMirror.rotation, "x", -100, 100, 0.01);
+gui.add(groundMirror.rotation, "y", -100, 100, 0.01);
+gui.add(groundMirror.rotation, "z", -100, 100, 0.01);
+//groundMirror.rotation
+scene.add(groundMirror);
+
+const material1 = new THREE.MeshStandardMaterial({ color: 0xff00ff });
+const geometry1 = new THREE.BoxGeometry(50, 50, 50);
+
+const cube = new THREE.Mesh(geometry1, material1);
+cube.position.z = -250;
+scene.add(cube);
+
+// const fbxLoader = new FBXLoader();
+// fbxLoader.load("models/32inchmonitor.fbx", (object) => {
+//   object.scale.set(0.037, 0.037, 0.037);
+//   console.log(object.position);
+//   object.position.y = 0.7;
+//   object.position.x = 1.8;
+//   object.rotation.set(0.09, -3.8, 0);
+//   scene.add(object);
+//   objects.push(object);
+// });
+
+function animate() {
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+  mirrorShader.uniforms.time.value += 0.503;
+  groundMirror.material.uniforms.time.value += 0.0503;
+}
+animate();
+
+window.addEventListener("resize", () => {
+  //camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  //renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// window.addEventListener("resize", () => {
+//   //camera.aspect = container.clientWidth / container.clientHeight;
+//   camera.updateProjectionMatrix();
+//   //renderer.setSize(container.clientWidth, container.clientHeight);
+// });
