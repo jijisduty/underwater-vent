@@ -1446,38 +1446,15 @@ function animate() {
   const timer = 0.0001 * Date.now();
   requestAnimationFrame(animate);
 
-  // for (let i = 0, il = spheres.length; i < il; i++) {
-  //   const sphere = spheres[i];
-
-  //   sphere.position.x = 5000 * Math.cos(timer + i);
-  //   sphere.position.y = 8000 * Math.sin(timer + i * 1.1);
-  //   sphere.position.z = -5000 * Math.sin(timer + i * 1.1);
-  //   sphere.layers.set(2);
-  // }
-
-  // for (let i = 0, il = spheres.length; i < il; i++) {
-  //   const sphere = spheres[i];
-  //   sphere.position.x = 4000 * Math.cos(timer + i * -10);
-  //   sphere.position.y = 10000 * Math.sin(timer + i * 81.1);
-  //   sphere.layers.set(2);
-  // }
-
-  // if (ventSmoke) {
-  //   ventSmoke.rotation.y += 0.01;
-  //   ventSmoke.rotation.y += 0.01;
-  //   ventSmoke.range += 1;
-  // }
-
   //updateControlsBasedOnLayer();
   // Clear the previous frame
   renderer.clear();
   // Render Layer 0 (e.g., main scene objects)
   camera.layers.set(0);
   controls.enabled = false;
-  composer.render(); // Assuming composer is set up for layer 0 effects
+  composer.render(); 
   //console.log(ventSmoke);
 
-  // Clear only the depth buffer to allow layer 1 to render without depth conflicts
   renderer.clearDepth();
 
   const now = performance.now();
@@ -1511,14 +1488,9 @@ function animate() {
   fishUniforms["textureVelocity"].value =
     gpuCompute.getCurrentRenderTarget(velocityVariable).texture;
 
-  if (ventSmokeMaterial) {
+
     ventSmokeMaterial.uniforms.uTime.value -= 0.1; // Increment or update time
     ventSmoke.rotation.y -= 0.001;
-    // ventSmokeMaterial.uniforms.opacity.value = Math.sin(0.002);
-    //console.log("opac", ventSmokeMaterial.uniforms.opacity.value);
-
-    //console.log("utime");
-  }
 
   // Update time-dependent transformations
   const elapsedTime = clock.getElapsedTime();
@@ -1549,11 +1521,5 @@ function updateDynamicElements(elapsedTime) {
   mirrorShader.uniforms.time.value += 0.503;
   groundMirror.material.uniforms.time.value += 0.0503;
 }
-
-// let sine;
-// for (let i = 0; i < 0.2; i -= 0.01) {
-//   sine = Math.sin(i);
-//   // console.log("sine ", sine);
-// }
 
 animate();
