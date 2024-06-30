@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-//import GUI from "three/addons/libs/lil-gui.module.min.js";
+import GUI from "three/addons/libs/lil-gui.module.min.js";
 import { Reflector } from "three/addons/objects/Reflector.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
@@ -27,7 +27,7 @@ import { ImprovedNoise } from "three/addons/math/ImprovedNoise.js";
  * Base
  */
 // Debug
-//const gui = new GUI({ width: 340 });
+const gui = new GUI({ width: 340 });
 
 // Canvas
 //const canvas = document.querySelector("canvas.webgl");
@@ -343,6 +343,7 @@ void main() {
 }
 
 `;
+
 const fragmentShaderPosition = `
 uniform float time;
 uniform float delta;
@@ -562,7 +563,11 @@ void main(){
 
   }
 
-  color =  ac * vec4(0.5, 1.5, 1.6, 1.0);
+  //color =  ac * vec4(2.8, 1.9, 1.7, 1.3);
+  color =  ac * vec4(0.8, 3.5, 3.5, 1.0);
+ //color =  ac * vec4(2.2,3.5,3.7, 1.2);
+ //color =  ac * vec4(5.0,4.3,4.45, 1.2);
+  
 
 //	if ( color.a == 0.0 ) discard;
 
@@ -1146,8 +1151,6 @@ class BirdGeometry extends THREE.BufferGeometry {
       }
     }
 
-    const wingsSpan = 10;
-
     for (let f = 0; f < FISHIES; f++) {
       // Body
 
@@ -1279,7 +1282,7 @@ function fillPositionTexture(texture) {
   const theArray = texture.image.data;
 
   for (let k = 0, kl = theArray.length; k < kl; k += 4) {
-    const x = Math.random() * 50 - 200;
+    const x = Math.random() * 100 - 5;
     //const x = 100;
     // const y = Math.random() * BOUNDS - BOUNDS_HALF;
     // const z = Math.random() * BOUNDS - BOUNDS_HALF;
@@ -1397,12 +1400,12 @@ ventSmoke.position.z = -1; //-0.8;
 ventSmoke.rotation.x = 15.8; //15.7;
 ventSmoke.rotation.y = 16.4; //14.6;
 ventSmoke.rotation.z = 1.7; //1.9;
-//gui.add(ventSmoke.position, "x", -100, 100, 0.1).name("ventSmokeX");
-//gui.add(ventSmoke.position, "y", -100, 100, 0.1).name("ventSmokeY");
-//gui.add(ventSmoke.position, "z", -100, 100, 0.1).name("ventSmokeZ");
-//gui.add(ventSmoke.rotation, "x", -100, 100, 0.1).name("ventSmokeXRot");
-//gui.add(ventSmoke.rotation, "y", -100, 100, 0.1).name("ventSmokeYRot");
-//gui.add(ventSmoke.rotation, "z", -100, 100, 0.1).name("ventSmokeZRot");
+gui.add(ventSmoke.position, "x", -100, 100, 0.1).name("ventSmokeX");
+gui.add(ventSmoke.position, "y", -100, 100, 0.1).name("ventSmokeY");
+gui.add(ventSmoke.position, "z", -100, 100, 0.1).name("ventSmokeZ");
+gui.add(ventSmoke.rotation, "x", -100, 100, 0.1).name("ventSmokeXRot");
+gui.add(ventSmoke.rotation, "y", -100, 100, 0.1).name("ventSmokeYRot");
+gui.add(ventSmoke.rotation, "z", -100, 100, 0.1).name("ventSmokeZRot");
 
 console.log("d" + ventSmoke);
 
