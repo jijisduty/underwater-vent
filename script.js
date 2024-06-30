@@ -1111,7 +1111,7 @@ const clock = new THREE.Clock();
  */
 
 /* TEXTURE WIDTH FOR SIMULATION */
-const WIDTH = 85;
+const WIDTH = 45;
 
 const FISHIES = WIDTH * WIDTH;
 
@@ -1438,29 +1438,18 @@ function update() {
  */
 
 renderer.autoClear = false;
-
-let duration = 3000; // Duration in milliseconds
-let startTime = Date.now(); // Start time
+controls.enabled = false;
+let previousTime = Date.now();
 
 function animate() {
-  const timer = 0.0001 * Date.now();
   requestAnimationFrame(animate);
-
-  //updateControlsBasedOnLayer();
-  // Clear the previous frame
-  renderer.clear();
-  // Render Layer 0 (e.g., main scene objects)
+  // Render Layer 0
   camera.layers.set(0);
-  controls.enabled = false;
-  composer.render(); 
-  //console.log(ventSmoke);
 
+  composer.render();
   renderer.clearDepth();
-
   const now = performance.now();
-
   let delta = (now - last) / 3000;
-  //console.log(delta);
 
   if (delta > 1) delta = 1; // safety cap on large deltas
   last = now;
@@ -1468,7 +1457,7 @@ function animate() {
   positionUniforms["time"].value = now;
   positionUniforms["delta"].value = delta;
   velocityUniforms["time"].value = now;
-  velocityUniforms["delta"].value = delta * 0.5;
+  velocityUniforms["delta"].value = delta * 0.05;
   fishUniforms["time"].value = now;
   fishUniforms["delta"].value = delta;
 
@@ -1488,9 +1477,11 @@ function animate() {
   fishUniforms["textureVelocity"].value =
     gpuCompute.getCurrentRenderTarget(velocityVariable).texture;
 
-
-    ventSmokeMaterial.uniforms.uTime.value -= 0.1; // Increment or update time
-    ventSmoke.rotation.y -= 0.001;
+  let currentTime = Date.now();
+  let deltaTime = (currentTime - previousTime) / 110; // Convert to seconds
+  ventSmokeMaterial.uniforms.uTime.value += deltaTime;
+  ventSmoke.rotation.y -= 0.04 * deltaTime;
+  previousTime = currentTime;
 
   // Update time-dependent transformations
   const elapsedTime = clock.getElapsedTime();
@@ -1503,10 +1494,7 @@ function animate() {
   ventCamera.layers.set(3);
   particlesCamera.layers.set(2);
 
-  renderer.render(scene, camera); // Using renderer directly if no post-processing is needed for layer 1
-
-  // Update any other dynamic elements
-  updateDynamicElements(elapsedTime); // Handles other time-based updates
+  updateDynamicElements(elapsedTime);
 }
 
 function updateParticlePositions(elapsedTime) {
@@ -1523,3 +1511,4 @@ function updateDynamicElements(elapsedTime) {
 }
 
 animate();
+
