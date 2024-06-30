@@ -1181,7 +1181,7 @@ class BirdGeometry extends THREE.BufferGeometry {
       fishVertex.array[v] = v % 3;
     }
 
-    this.scale(0.03, 0.03, 0.03);
+    this.scale(0.1, 0.1, 0.1);
   }
 }
 
