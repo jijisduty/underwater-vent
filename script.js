@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import GUI from "three/addons/libs/lil-gui.module.min.js";
+//import GUI from "three/addons/libs/lil-gui.module.min.js";
 import { Reflector } from "three/addons/objects/Reflector.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
@@ -1400,12 +1400,12 @@ ventSmoke.position.z = -1; //-0.8;
 ventSmoke.rotation.x = 15.8; //15.7;
 ventSmoke.rotation.y = 16.4; //14.6;
 ventSmoke.rotation.z = 1.7; //1.9;
-gui.add(ventSmoke.position, "x", -100, 100, 0.1).name("ventSmokeX");
-gui.add(ventSmoke.position, "y", -100, 100, 0.1).name("ventSmokeY");
-gui.add(ventSmoke.position, "z", -100, 100, 0.1).name("ventSmokeZ");
-gui.add(ventSmoke.rotation, "x", -100, 100, 0.1).name("ventSmokeXRot");
-gui.add(ventSmoke.rotation, "y", -100, 100, 0.1).name("ventSmokeYRot");
-gui.add(ventSmoke.rotation, "z", -100, 100, 0.1).name("ventSmokeZRot");
+//gui.add(ventSmoke.position, "x", -100, 100, 0.1).name("ventSmokeX");
+//gui.add(ventSmoke.position, "y", -100, 100, 0.1).name("ventSmokeY");
+//gui.add(ventSmoke.position, "z", -100, 100, 0.1).name("ventSmokeZ");
+//gui.add(ventSmoke.rotation, "x", -100, 100, 0.1).name("ventSmokeXRot");
+//gui.add(ventSmoke.rotation, "y", -100, 100, 0.1).name("ventSmokeYRot");
+//gui.add(ventSmoke.rotation, "z", -100, 100, 0.1).name("ventSmokeZRot");
 
 console.log("d" + ventSmoke);
 
