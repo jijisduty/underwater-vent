@@ -27,7 +27,7 @@ import { ImprovedNoise } from "three/addons/math/ImprovedNoise.js";
  * Base
  */
 // Debug
-const gui = new GUI({ width: 340 });
+//const gui = new GUI({ width: 340 });
 
 // Canvas
 //const canvas = document.querySelector("canvas.webgl");
