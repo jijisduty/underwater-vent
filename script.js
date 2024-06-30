@@ -736,6 +736,8 @@ dracoLoader.setDecoderPath("draco/");
 
 loader.setDRACOLoader(dracoLoader);
 
+//hydrothermal vent 3d model from:
+//https://sketchfab.com/3d-models/d1246-miniature-deep-sea-hydrothermal-vent-c21bcda1a2c04452a72ea4bf5c525dab
 var ventModel;
 var ventModelLoaded = false;
 
