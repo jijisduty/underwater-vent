@@ -1111,7 +1111,7 @@ const clock = new THREE.Clock();
  */
 
 /* TEXTURE WIDTH FOR SIMULATION */
-const WIDTH = 45;
+const WIDTH = 65;
 
 const FISHIES = WIDTH * WIDTH;
 
@@ -1181,7 +1181,7 @@ class BirdGeometry extends THREE.BufferGeometry {
       fishVertex.array[v] = v % 3;
     }
 
-    this.scale(0.06, 0.06, 0.06);
+    this.scale(0.05, 0.05, 0.05);
   }
 }
 
