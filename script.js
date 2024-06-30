@@ -256,7 +256,7 @@ void main() {
   dist = length( dir );
   distSquared = dist * dist;
 
-  float preyRadius = 580.0;
+  float preyRadius = 280.0;
   float preyRadiusSq = preyRadius * preyRadius;
 
 
@@ -267,11 +267,6 @@ void main() {
     velocity += normalize( dir ) * f *1.2;
     limit += 5.0;
   }
-
-
-  // if (testing == 0.0) {}
-  // if ( rand( uv + time ) < freedomFactor ) {}
-
 
   // Attract flocks to the center
   vec3 central = vec3( 0., 0., 0. );
@@ -348,7 +343,6 @@ void main() {
 }
 
 `;
-
 const fragmentShaderPosition = `
 uniform float time;
 uniform float delta;
